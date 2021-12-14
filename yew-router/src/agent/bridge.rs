@@ -4,10 +4,8 @@ use std::{
     fmt::{Debug, Error as FmtError, Formatter},
     ops::{Deref, DerefMut},
 };
-use yew::{
-    agent::{Bridged, Context},
-    Bridge, Callback,
-};
+use yew::Callback;
+use yew_agent::{Bridge, Bridged, Context, Discoverer};
 
 /// A wrapped bridge to the route agent.
 ///
@@ -30,7 +28,6 @@ where
     ///
     /// Directly spawn a new Router
     pub fn spawn(callback: Callback<Route<STATE>>) -> Self {
-        use yew::agent::Discoverer;
         let router_agent = Context::spawn_or_join(Some(callback));
         RouteAgentBridge(router_agent)
     }

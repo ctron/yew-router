@@ -9,7 +9,7 @@ use std::{
     fmt::{self, Debug, Error as FmtError, Formatter},
     rc::Rc,
 };
-use yew::{html, virtual_dom::VNode, Component, ComponentLink, Html, Properties, ShouldRender};
+use yew::{html, virtual_dom::VNode, Component, Context, Html, Properties};
 
 /// Any state that can be managed by the `Router` must meet the criteria of this trait.
 pub trait RouterState: RouteState + PartialEq {}
@@ -29,17 +29,10 @@ impl<STATE> RouterState for STATE where STATE: RouteState + PartialEq {}
 ///     //...
 /// #   type Message = Msg;
 /// #   type Properties = ();
-/// #   fn create(_: Self::Properties, _link: ComponentLink<Self>) -> Self {
+/// #   fn create(_: &Context<Self>) -> Self {
 /// #       Model {}
 /// #   }
-/// #   fn update(&mut self, msg: Self::Message) -> ShouldRender {
-/// #        false
-/// #   }
-/// #   fn change(&mut self, props: Self::Properties) -> ShouldRender {
-/// #        false
-/// #   }
-///
-///     fn view(&self) -> VNode {
+///     fn view(&self, _: &Context<Self>) -> VNode {
 ///         html! {
 ///         <Router<S>
 ///            render = Router::render(|switch: S| {
@@ -62,14 +55,13 @@ impl<STATE> RouterState for STATE where STATE: RouteState + PartialEq {}
 #[derive(Debug)]
 pub struct Router<SW: Switch + Clone + 'static, STATE: RouterState = ()> {
     switch: Option<SW>,
-    props: Props<STATE, SW>,
     router_agent: RouteAgentBridge<STATE>,
 }
 
 impl<SW, STATE> Router<SW, STATE>
 where
     STATE: RouterState,
-    SW: Switch + Clone + 'static,
+    SW: Switch + PartialEq + Clone + 'static,
 {
     /// Wrap a render closure so that it can be used by the Router.
     /// # Example
@@ -117,7 +109,14 @@ impl<T, CTX: Component, SW> RenderFn<CTX, SW> for T where T: Fn(SW) -> Html {}
 pub struct Render<SW: Switch + Clone + 'static, STATE: RouterState = ()>(
     pub(crate) Rc<dyn RenderFn<Router<SW, STATE>, SW>>,
 );
-impl<STATE: RouterState, SW: Switch + Clone> Render<SW, STATE> {
+
+impl<SW: Switch + Clone + 'static, STATE: RouterState> PartialEq for Render<SW, STATE> {
+    fn eq(&self, other: &Self) -> bool {
+        Rc::ptr_eq(&self.0, &other.0)
+    }
+}
+
+impl<STATE: RouterState, SW: Switch + PartialEq + Clone> Render<SW, STATE> {
     /// New render function
     fn new<F: RenderFn<Router<SW, STATE>, SW> + 'static>(f: F) -> Self {
         Render(Rc::new(f))
@@ -138,6 +137,11 @@ impl<T, SW, STATE> RedirectFn<SW, STATE> for T where T: Fn(Route<STATE>) -> SW {
 pub struct Redirect<SW: Switch + 'static, STATE: RouterState>(
     pub(crate) Rc<dyn RedirectFn<SW, STATE>>,
 );
+impl<SW: Switch + 'static, STATE: RouterState> PartialEq for Redirect<SW, STATE> {
+    fn eq(&self, other: &Self) -> bool {
+        Rc::ptr_eq(&self.0, &other.0)
+    }
+}
 impl<STATE: RouterState, SW: Switch + 'static> Redirect<SW, STATE> {
     fn new<F: RedirectFn<SW, STATE> + 'static>(f: F) -> Self {
         Redirect(Rc::new(f))
@@ -150,8 +154,8 @@ impl<STATE: RouterState, SW: Switch> Debug for Redirect<SW, STATE> {
 }
 
 /// Properties for Router.
-#[derive(Properties, Clone)]
-pub struct Props<STATE: RouterState, SW: Switch + Clone + 'static> {
+#[derive(Properties, Clone, PartialEq)]
+pub struct Props<STATE: RouterState, SW: Switch + PartialEq + PartialEq + Clone + 'static> {
     /// Render function that takes a Switch and produces Html
     pub render: Render<SW, STATE>,
     /// Optional redirect function that will convert the route to a known switch variant if explicit matching fails.
@@ -161,7 +165,7 @@ pub struct Props<STATE: RouterState, SW: Switch + Clone + 'static> {
     pub redirect: Option<Redirect<SW, STATE>>,
 }
 
-impl<STATE: RouterState, SW: Switch + Clone> Debug for Props<STATE, SW> {
+impl<STATE: RouterState, SW: Switch + PartialEq + Clone> Debug for Props<STATE, SW> {
     fn fmt(&self, f: &mut Formatter) -> Result<(), FmtError> {
         f.debug_struct("Props").finish()
     }
@@ -170,31 +174,30 @@ impl<STATE: RouterState, SW: Switch + Clone> Debug for Props<STATE, SW> {
 impl<STATE, SW> Component for Router<SW, STATE>
 where
     STATE: RouterState,
-    SW: Switch + Clone + 'static,
+    SW: Switch + PartialEq + Clone + 'static,
 {
     type Message = Msg<STATE>;
     type Properties = Props<STATE, SW>;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        let callback = link.callback(Msg::UpdateRoute);
+    fn create(ctx: &Context<Self>) -> Self {
+        let callback = ctx.link().callback(Msg::UpdateRoute);
         let mut router_agent = RouteAgentBridge::new(callback);
         router_agent.send(RouteRequest::GetCurrentRoute);
 
         Router {
             switch: Default::default(), /* This must be updated by immediately requesting a route
                                          * update from the service bridge. */
-            props,
             router_agent,
         }
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::UpdateRoute(route) => {
                 let mut switch = SW::switch(route.clone());
 
                 if switch.is_none() {
-                    if let Some(redirect) = &self.props.redirect {
+                    if let Some(redirect) = &ctx.props().redirect {
                         let redirected: SW = (&redirect.0)(route);
 
                         log::trace!(
@@ -215,14 +218,9 @@ where
         }
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props = props;
-        true
-    }
-
-    fn view(&self) -> VNode {
+    fn view(&self, ctx: &Context<Self>) -> VNode {
         match self.switch.clone() {
-            Some(switch) => (&self.props.render.0)(switch),
+            Some(switch) => (&ctx.props().render.0)(switch),
             None => {
                 log::warn!("No route matched, provide a redirect prop to the router to handle cases where no route can be matched");
                 html! {"No route matched"}
