@@ -7,6 +7,15 @@ Also see: https://github.com/yewstack/yew/issues/1853
 
 This fork ports the 0.15 router from Yew 0.18 to Yew 0.19.
 
+## Using
+
+You can use this by patching the `yew-router` dependency in your `Cargo.toml`:
+
+~~~toml
+[patch.crates-io]
+yew-router = { git = "https://github.com/ctron/yew-router", branch="main" }
+~~~
+
 ## Migration
 
 While this should mostly be a drop-in replacement for the 0.15 router, there may be a few steps required to migrate:
