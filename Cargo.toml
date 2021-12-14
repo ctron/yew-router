@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "yew-router",
+    "yew-router-macro",
+    "yew-router-route-parser",
+]
