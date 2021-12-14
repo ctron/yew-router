@@ -3,6 +3,8 @@
 This is fork of version 0.15 of the `yew-router`. The main motivation behind the fork is the lack of nested router
 support in the 0.16 release.
 
+Also see: https://github.com/yewstack/yew/issues/1853
+
 This fork ports the 0.15 router from Yew 0.18 to Yew 0.19.
 
 ## Migration
