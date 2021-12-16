@@ -113,7 +113,9 @@ where
     }
 
     fn connected(&mut self, id: HandlerId) {
-        self.subscribers.insert(id);
+        if id.is_respondable() {
+            self.subscribers.insert(id);
+        }
     }
 
     fn handle_input(&mut self, msg: Self::Input, who: HandlerId) {
@@ -153,6 +155,8 @@ where
     }
 
     fn disconnected(&mut self, id: HandlerId) {
-        self.subscribers.remove(&id);
+        if id.is_respondable() {
+            self.subscribers.remove(&id);
+        }
     }
 }
