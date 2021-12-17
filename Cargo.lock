@@ -655,8 +655,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "yew-router"
-version = "0.15.0"
+name = "yew-router-nested"
+version = "0.16.0"
 dependencies = [
  "cfg-if",
  "cfg-match",
@@ -672,24 +672,24 @@ dependencies = [
  "web-sys",
  "yew",
  "yew-agent",
- "yew-router-macro",
- "yew-router-route-parser",
+ "yew-router-nested-macro",
+ "yew-router-nested-route-parser",
 ]
 
 [[package]]
-name = "yew-router-macro"
-version = "0.15.0"
+name = "yew-router-nested-macro"
+version = "0.16.0"
 dependencies = [
  "proc-macro2",
  "quote",
  "syn",
- "yew-router",
- "yew-router-route-parser",
+ "yew-router-nested",
+ "yew-router-nested-route-parser",
 ]
 
 [[package]]
-name = "yew-router-route-parser"
-version = "0.15.0"
+name = "yew-router-nested-route-parser"
+version = "0.16.0"
 dependencies = [
  "nom",
 ]

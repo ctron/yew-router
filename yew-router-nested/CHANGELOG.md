@@ -13,8 +13,18 @@
 
 END TEMPLATE-->
 
+## ✨ **0.16.0** *2021-12-30* 
 
-## ✨ **0.15.0** *(TBD)*
+- #### ⚡️ Features
+  - Bump `yew` version to `0.19`.
+- #### 🛠 Fixes
+  - Only broadcast to "responsible" handlers. Remove the warning message in the console.
+- #### 🚨 Breaking changes
+  - This is a fork of `yew-router`, see https://github.com/ctron/yew-router#readme
+  - The name of the crates is changed to `yew-router-fork`, `yew-router-fork-macro`, `yew-router-fork-route-parser`
+  - Requires `yew` 0.19 and `yew-agent` 0.1 now.
+
+## ✨ **0.15.0** *(2021-05-15)*
 
 - #### ⚡️ Features
   - None
