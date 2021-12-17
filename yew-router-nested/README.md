@@ -1,6 +1,9 @@
-# yew-router
+# yew-router-nested
 A routing library for the [Yew](https://github.com/yewstack/yew) frontend framework.
 
+**NOTE:** This is a fork of the original `yew-router` (0.15) library. It was ported to `yew` 0.19, in order to keep
+the ability to use nested routers. With `yew` 0.19 the `yew-router` (0.16) was re-written, but no longer supported
+the nesting of routers. This fork exists to fill the gap until the new router gains the same functionality.
 
 ### Example
 ```rust
@@ -53,14 +56,21 @@ Look at https://webpack.js.org/configuration/dev-server/#devserverhistoryapifall
 You can use the released version by adding these to your dependencies.
 ```toml
 [dependencies]
-yew-router = "0.14.0"
-yew = "0.17.0"
+yew-router-nested = "0.16.0"
+yew = "0.19.0"
+```
+
+You can also import the package, and keep the module name `yew_router` in your code:
+```toml
+[dependencies]
+yew-router = { version = "0.16.0", package = "yew-router-nested" }
+yew = "0.19.0"
 ```
 
 You can use the in-development version in your project by adding it to your dependencies like so:
 ```toml
 [dependencies]
-yew-router = { git = "https://github.com/yewstack/yew_router", branch="master" }
+yew-router = { git = "https://github.com/ctron/yew-router", branch="main" }
 yew = {git = "https://github.com/yewstack/yew", branch = "master"}
 ```
 
