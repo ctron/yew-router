@@ -683,7 +683,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
- "yew-router-nested",
  "yew-router-nested-route-parser",
 ]
 

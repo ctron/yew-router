@@ -17,4 +17,4 @@ yew-router-route-parser = { version = "^0.16.0", path = "../yew-router-nested-ro
 proc-macro2 = "1.0.1"
 
 [dev-dependencies]
-yew-router = { version = "0.16.0", path = "../yew-router-nested", package = "yew-router-nested" } # This should probably be removed, it makes the deploy process much more annoying.
+#yew-router = { version = "0.16.0", path = "../yew-router-nested", package = "yew-router-nested" } # This should probably be removed, it makes the deploy process much more annoying.
