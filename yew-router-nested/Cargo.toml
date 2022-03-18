@@ -1,6 +1,6 @@
 [package]
 name = "yew-router-nested"
-version = "0.16.0"
+version = "0.16.1"
 authors = ["Henry Zimmerman <zimhen7@gmail.com>", "Sascha Grunert <mail@saschagrunert.de>", "Jens Reimann <ctron@dentrassi.de>"]
 edition = "2018"
 license = "MIT/Apache-2.0"
@@ -36,7 +36,7 @@ yew-router-route-parser = { version = "^0.16.0", path = "../yew-router-nested-ro
 
 cfg-if = "1.0.0"
 cfg-match = "0.2"
-gloo = { version = "0.2.0", optional = true }
+gloo = { version = "0.4.0", optional = true }
 js-sys = { version = "0.3.35", optional = true }
 log = "0.4.8"
 nom = "5.1.1"
