@@ -7,7 +7,7 @@ the nesting of routers. This fork exists to fill the gap until the new router ga
 
 ### Example
 ```rust
-#[derive(Switch, Debug, Clone)]
+#[derive(Switch, Debug, Clone, PartialEq)]
 pub enum AppRoute {
     #[to = "/profile/{id}"]
     Profile(u32),
@@ -17,23 +17,23 @@ pub enum AppRoute {
     Index,
 }
 
-#[derive(Switch, Debug, Clone)]
+#[derive(Switch, Debug, Clone, PartialEq)]
 pub enum ForumRoute {
     #[to = "/{subforum}/{thread_slug}"]
-    SubForumAndThread{subforum: String, thread_slug: String}
+    SubForumAndThread{subforum: String, thread_slug: String},
     #[to = "/{subforum}"]
-    SubForum{subforum: String}
+    SubForum{subforum: String},
 }
 
 html! {
     <Router<AppRoute, ()>
-        render = Router::render(|switch: AppRoute| {
+        render = { Router::render(|switch: AppRoute| {
             match switch {
                 AppRoute::Profile(id) => html!{<ProfileComponent id = id/>},
                 AppRoute::Index => html!{<IndexComponent/>},
                 AppRoute::Forum(forum_route) => html!{<ForumComponent route = forum_route/>},
             }
-        })
+        }) }
     />
 }
 ```
